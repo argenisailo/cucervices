@@ -1,0 +1,23 @@
+# Usa una imagen base más ligera
+FROM python:3.9
+
+# Instala las dependencias de OpenCV y limpia después de la instalación
+RUN apt-get update && apt-get install -y --no-install-recommends libgl1-mesa-glx && rm -rf /var/lib/apt/lists/*
+
+# Establece el directorio de trabajo
+WORKDIR /app
+
+# Copia los archivos de código al contenedor
+COPY . /app
+
+# Instala las dependencias necesarias con no-cache-dir
+RUN pip install --no-cache-dir Flask requests tensorflow facenet-pytorch mtcnn opencv-python-headless Pillow
+
+# Limpia archivos temporales y cachés
+RUN apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Expone el puerto 3000 para Flask
+EXPOSE 3000
+
+# Ejecuta la aplicación Flask cuando se inicia el contenedor
+CMD python ./app.py
